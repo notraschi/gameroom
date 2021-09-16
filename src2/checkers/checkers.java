@@ -25,6 +25,11 @@ public class checkers extends JPanel{
     ArrayList<stone> pos = new ArrayList<stone>();
     ArrayList<stone> oppPos = new ArrayList<stone>();
     ArrayList<stone> moveDot = new ArrayList<stone>();
+    ArrayList<stone> comboDot = new ArrayList<stone>();
+    ArrayList<stone> comboKillsTL = new ArrayList<stone>();
+    ArrayList<stone> comboKillsTR = new ArrayList<stone>();
+    ArrayList<stone> comboKillsBL = new ArrayList<stone>();
+    ArrayList<stone> comboKillsBR = new ArrayList<stone>();
 
     public checkers(boolean turn, App p){
         setSize(500,500);
@@ -37,28 +42,63 @@ public class checkers extends JPanel{
 
     //===================================================================================================== ME MOVING ======================================================
 
-    public void nextMove(stone dot, stone s){
+    public void nextMove(stone dot, stone s, boolean combo){
 
         pos.remove(s);
         stone ss = new stone(dot.x-12, dot.y-12);
         ss.damone = checkBecomeDamone(ss, s);
         pos.add(ss);
-        moveDot.clear();
         yourTurn = false;
-        
-        for (stone pk : possibleKills){ //killing
-            if (pk.x == dot.x+37-12 || pk.x == dot.x-37-12) oppPos.remove(pk);
+        if(!combo){
+            for (stone pk : possibleKills){ //killing
+                if (pk.x == dot.x+37-12 || pk.x == dot.x-37-12) oppPos.remove(pk);
+            }
+        } else {
+            System.out.println(comboDot.size()+" "+comboKillsBL.size());
+            for (stone cd : comboDot){          // COMBO KILLS 
+                if (cd.dotDirection.equals("tl")){
+                    for (stone t : comboKillsTL){
+                        if (comboKillsTL.indexOf(t)<getIndexComboDot(dot)+2) oppPos.remove(t);
+                    }
+                } else if (cd.dotDirection.equals("tr")){
+                    for (stone t : comboKillsTR){
+                        if (comboKillsTR.indexOf(t)<getIndexComboDot(dot)+2) oppPos.remove(t);
+                    }
+                } else if (cd.dotDirection.equals("bl")){
+                    for (stone t : comboKillsBL){
+                        if (comboKillsBL.indexOf(t)<getIndexComboDot(dot)+2) oppPos.remove(t);
+                    }
+                } else if (cd.dotDirection.equals("br")){
+                    for (stone t : comboKillsBR){
+                        if (comboKillsBR.indexOf(t)<getIndexComboDot(dot)+2) oppPos.remove(t);
+                    }
+                }
+            }
         }
+        comboKillsBL.clear();
+        comboKillsBR.clear();
+        comboKillsTL.clear();
+        comboKillsTR.clear();
+        comboDot.clear();
+        moveDot.clear();
         repaint();
 
         gameState = createGameState();
         try {
-            if (checkWin()) {System.out.println("hi :)"); gameroom.checkersLastTurn(gameState+"\n");}
+            if (checkWin()) {gameroom.checkersLastTurn(gameState+"\n");}
             else gameroom.checkersNextTurn(gameState+"\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
         checkWin();
+    }
+
+    private int getIndexComboDot(stone dot){
+
+        for(stone s : comboDot){
+            if(s.x==dot.x && s.y==dot.y) {/*System.out.println(comboDot.indexOf(s)); */return comboDot.indexOf(s);}
+        }
+        return 0;
     }
 
     public boolean validateMove(double x, double y){
@@ -71,7 +111,10 @@ public class checkers extends JPanel{
             movingStone = s;
             return true;
         } else if (moveDot.contains(dot)) {
-            nextMove(dot, movingStone);
+            nextMove(dot, movingStone, false);
+            return true;
+        } else if (comboDot.contains(dot)) {
+            nextMove(dot, movingStone, true);
             return true;
         }
         else return false;
@@ -80,6 +123,7 @@ public class checkers extends JPanel{
     public void calculatePossibleMoves(stone s){
 
         moveDot.clear();
+        comboDot.clear();
         possibleKills.clear();
         stone ss = new stone((Math.floor(s.x/blocksize)-1)*blocksize, (Math.floor(s.y/blocksize)-1)*blocksize);//tl
         if(!pos.contains(ss) && !oppPos.contains(ss)) {
@@ -87,10 +131,12 @@ public class checkers extends JPanel{
             moveDot.add(dot1);
         } else if (!pos.contains(ss) && oppPos.contains(ss)) {
             possibleKills.add(ss);
+            stone sss = ss;
             ss = new stone((Math.floor(s.x/blocksize)-2)*blocksize, (Math.floor(s.y/blocksize)-2)*blocksize);//tl2
             if(!pos.contains(ss) && !oppPos.contains(ss)) {
                 stone dot1 = new stone(ss.x, ss.y, true);
                 moveDot.add(dot1);
+                checkCombo(ss, s.damone, "null", sss, "br");
             }
         }
         ss = new stone((Math.floor(s.x/blocksize)+1)*blocksize, (Math.floor(s.y/blocksize)-1)*blocksize);//tr
@@ -99,10 +145,12 @@ public class checkers extends JPanel{
             moveDot.add(dot1);
         } else if (!pos.contains(ss) && oppPos.contains(ss)) {
             possibleKills.add(ss);
+            stone sss = ss;
             ss = new stone((Math.floor(s.x/blocksize)+2)*blocksize, (Math.floor(s.y/blocksize)-2)*blocksize);//tr2
             if(!pos.contains(ss) && !oppPos.contains(ss)) {
                 stone dot1 = new stone(ss.x, ss.y, true);
                 moveDot.add(dot1);
+                checkCombo(ss, s.damone, "null", sss, "bl");
             }
         }
         // =========================== IF DAMONE ==========================================================================
@@ -113,10 +161,12 @@ public class checkers extends JPanel{
                 moveDot.add(dot1);
             } else if (!pos.contains(ss) && oppPos.contains(ss)) {
                 possibleKills.add(ss);
+                stone sss = ss;
                 ss = new stone((Math.floor(s.x/blocksize)-2)*blocksize, (Math.floor(s.y/blocksize)+2)*blocksize);//bl2
                 if(!pos.contains(ss) && !oppPos.contains(ss)) {
                     stone dot1 = new stone(ss.x, ss.y, true);
                     moveDot.add(dot1);
+                    checkCombo(ss, true, "null", sss, "tr");
                 }
             }
             ss = new stone((Math.floor(s.x/blocksize)+1)*blocksize, (Math.floor(s.y/blocksize)+1)*blocksize);//br
@@ -125,14 +175,86 @@ public class checkers extends JPanel{
                 moveDot.add(dot1);
             } else if (!pos.contains(ss) && oppPos.contains(ss)) {
                 possibleKills.add(ss);
+                stone sss = ss;
                 ss = new stone((Math.floor(s.x/blocksize)+2)*blocksize, (Math.floor(s.y/blocksize)+2)*blocksize);//br2
                 if(!pos.contains(ss) && !oppPos.contains(ss)) {
                     stone dot1 = new stone(ss.x, ss.y, true);
                     moveDot.add(dot1);
+                    checkCombo(ss, true, "null", sss, "tl");
                 }
             }
         }
         repaint();
+    }
+
+    private void checkCombo (stone s, boolean damone, String cd, stone sss, String exC) {
+
+        stone ts = new stone((Math.floor(s.x/blocksize)-1)*blocksize, (Math.floor(s.y/blocksize)-1)*blocksize); //the one we eat         //tl2
+        stone ss = new stone((Math.floor(s.x/blocksize)-2)*blocksize, (Math.floor(s.y/blocksize)-2)*blocksize); //where we end up after combo
+        if(!pos.contains(ts) && oppPos.contains(ts) && !pos.contains(ss) && !oppPos.contains(ss) && !exC.equals("tl")) {
+            if (cd.equals("tl")){
+                comboKillsTL.add(ts);
+            } else if (cd.equals("tr")){
+                comboKillsTR.add(ts);
+            } else if (cd.equals("bl")){
+                comboKillsBL.add(ts);
+            } else if (cd.equals("br")){
+                comboKillsBR.add(ts);
+            } else {comboKillsTL.add(ts); comboKillsTL.add(sss); cd="tl";}
+            stone dot1 = new stone(ss.x, ss.y, true, cd);
+            comboDot.add(dot1);
+            checkCombo(ss, damone, cd, null, "br");
+        }
+        ts = new stone((Math.floor(s.x/blocksize)+1)*blocksize, (Math.floor(s.y/blocksize)-1)*blocksize); //the one we eat               //tr2
+        ss = new stone((Math.floor(s.x/blocksize)+2)*blocksize, (Math.floor(s.y/blocksize)-2)*blocksize); //where we end up after combo
+        if(!pos.contains(ts) && oppPos.contains(ts) && !pos.contains(ss) && !oppPos.contains(ss) && !exC.equals("tr")) {
+            if (cd.equals("tl")){
+                comboKillsTL.add(ts);
+            } else if (cd.equals("tr")){
+                comboKillsTR.add(ts);
+            } else if (cd.equals("bl")){
+                comboKillsBL.add(ts);
+            } else if (cd.equals("br")){
+                comboKillsBR.add(ts);
+            } else {comboKillsTR.add(ts); comboKillsTR.add(sss); cd="tr";}
+            stone dot1 = new stone(ss.x, ss.y, true, cd);
+            comboDot.add(dot1);
+            checkCombo(ss, damone, cd, null, "bl");
+        }
+        if (damone) {                                                                                                                    //bl2
+            ts = new stone((Math.floor(s.x/blocksize)-1)*blocksize, (Math.floor(s.y/blocksize)+1)*blocksize); //the one we eat
+            ss = new stone((Math.floor(s.x/blocksize)-2)*blocksize, (Math.floor(s.y/blocksize)+2)*blocksize); //where we end up after combo
+            if(!pos.contains(ts) && oppPos.contains(ts) && !pos.contains(ss) && !oppPos.contains(ss) && !exC.equals("bl")) {
+                if (cd.equals("tl")){
+                    comboKillsTL.add(ts);
+                } else if (cd.equals("tr")){
+                    comboKillsTR.add(ts);
+                } else if (cd.equals("bl")){
+                    comboKillsBL.add(ts);
+                } else if (cd.equals("br")){
+                    comboKillsBR.add(ts);
+                } else {comboKillsBL.add(ts); comboKillsBL.add(sss); cd="bl";}
+                stone dot1 = new stone(ss.x, ss.y, true, cd);
+                comboDot.add(dot1);
+                checkCombo(ss, damone, cd, null, "tr");
+            }
+            ts = new stone((Math.floor(s.x/blocksize)+1)*blocksize, (Math.floor(s.y/blocksize)+1)*blocksize); //the one we eat             //br2
+            ss = new stone((Math.floor(s.x/blocksize)+2)*blocksize, (Math.floor(s.y/blocksize)+2)*blocksize); //where we end up after combo
+            if(!pos.contains(ts) && oppPos.contains(ts) && !pos.contains(ss) && !oppPos.contains(ss) && !exC.equals("br")) {
+                if (cd.equals("tl")){
+                    comboKillsTL.add(ts);
+                } else if (cd.equals("tr")){
+                    comboKillsTR.add(ts);
+                } else if (cd.equals("bl")){
+                    comboKillsBL.add(ts);
+                } else if (cd.equals("br")){
+                    comboKillsBR.add(ts);
+                } else {comboKillsBR.add(ts); comboKillsBR.add(sss); cd="br";}
+                stone dot1 = new stone(ss.x, ss.y, true, cd);
+                comboDot.add(dot1);
+                checkCombo(ss, damone, cd, null, "tl");
+            }
+        }
     }
 
     private String createGameState(){
@@ -258,7 +380,7 @@ public class checkers extends JPanel{
 
     public void resetGrid(){
 
-        for (int i=0;i<8;i++){
+        for (int i=0;i<2;i++){          //8
             stone s = new stone();
             if(!(i%2==0)){
                 s.x = i*blocksize;
@@ -273,7 +395,7 @@ public class checkers extends JPanel{
             }
             pos.add(s);
         }
-        for (int i=0;i<8;i++){
+        for (int i=0;i<2;i++){          //8
             stone s = new stone();
             if(i%2==0 || i==0){
                 s.x = i*blocksize;
@@ -322,6 +444,12 @@ public class checkers extends JPanel{
             g2d.fill(s);
         }
         for(stone d : moveDot){
+            g2d.setColor(Color.orange);
+            d.x += 12;
+            d.y += 12;
+            g2d.fill(d);
+        }
+        for(stone d : comboDot){
             g2d.setColor(Color.orange);
             d.x += 12;
             d.y += 12;
