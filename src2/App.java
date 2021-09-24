@@ -1,7 +1,9 @@
 package src2;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -13,17 +15,18 @@ import java.awt.Color;
 import java.awt.event.*;
 import java.io.IOException;
 
-public class App extends JFrame implements ActionListener, MouseListener{
+public class App extends JFrame implements ActionListener, MouseListener{       // new Color(246, 228, 162) [BG]    // new Color(54, 38, 27) [CONTRAST]
 
     JPanel p = new JPanel();
-    JButton cliButton = new JButton("J");
-    JButton srvButton = new JButton("H");
-    JTextField cipField = new JTextField("192.168.8.130");
-    JTextField cportField = new JTextField("6969");
-    JTextField sportField = new JTextField("6969");
+    JButton cliButton = new JButton("JOIN");
+    JButton srvButton = new JButton("HOST");
+    JTextField cipField = new JTextField(" ip here"); //"192.168.8.130"
+    JTextField cportField = new JTextField(" port here"); // "6969"
+    JTextField sportField = new JTextField(" port here"); // "6969"
     JButton tictactoeButton = new JButton("TRIS");
     JButton fingergameButton = new JButton("FINGER GAME");
     JButton checkersButton = new JButton("CHECKERS");
+    JLabel VERSION = new JLabel("gameroom v0.2 - 09/21");
 
     JPanel test = new JPanel();
 
@@ -50,6 +53,9 @@ public class App extends JFrame implements ActionListener, MouseListener{
 
     App(){
 
+        VERSION.setBounds(03,390,200, 25);
+        p.setBackground(new Color(246, 228, 162));
+        p.add(VERSION);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setAlwaysOnTop(true);
         setVisible(true);
@@ -59,28 +65,41 @@ public class App extends JFrame implements ActionListener, MouseListener{
         p.addMouseListener(this);
         add(p);
         p.setLayout(null);
-        cliButton.setBounds(50, 50, 50, 50);
+        cliButton.setBounds(50, 75, 75, 50);
         cliButton.addActionListener(this);
         p.add(cliButton);
-        srvButton.setBounds(200, 50, 50, 50);
+        srvButton.setBounds(175, 75, 75, 50);
         srvButton.addActionListener(this);
         p.add(srvButton);
         tictactoeButton.addActionListener(this);
         fingergameButton.addActionListener(this);
         checkersButton.addActionListener(this);
 
-        cipField.setBounds(40, 110, 70, 25);
-        cportField.setBounds(50, 130, 50, 25);
-        sportField.setBounds(200, 110, 50, 25);
+        cipField.setBounds(50, 150, 75, 30);
+        cportField.setBounds(50, 200, 75, 30);
+        sportField.setBounds(175, 150, 75, 30);
         p.add(cportField);
         p.add(cipField);
         p.add(sportField);
         cipField.getText();
+
+        for (JTextField i : UITextField){
+            i.setBackground(Color.WHITE);
+            i.setBorder(BorderFactory.createLineBorder(new Color(54, 38, 27), 2, false));
+        }
+            
+        for (JButton i : UIButtons){
+            i.setBackground(Color.WHITE);
+            i.setBorder(BorderFactory.createLineBorder(new Color(54, 38, 27), 2, false));
+            i.setFocusable(false);
+        }
     }
 
     //================================================================================================= HANDLING COMMUNICATION ======================================================================
 
     public void lobby(boolean h) throws IOException {
+
+        VERSION.setForeground(new Color(246, 228, 162));
 
         for (JTextField i : UITextField){
         p.remove(i);}
@@ -88,22 +107,32 @@ public class App extends JFrame implements ActionListener, MouseListener{
         for (JButton i : UIButtons){
         p.remove(i);}
 
-        p.setBackground(Color.DARK_GRAY);
+        p.setBackground(new Color(54, 38, 27));
         
         if (host) {
-            tictactoeButton.setBounds(50, 50, 50, 50);
+            tictactoeButton.setBounds(75, 50, 150, 50);
+            tictactoeButton.setBackground(Color.WHITE);
+            tictactoeButton.setBorder(BorderFactory.createLineBorder(new Color(246, 228, 162), 2, false));
+            tictactoeButton.setFocusable(false);
             p.add(tictactoeButton);
             
-            fingergameButton.setBounds(150, 50, 50, 50);
+            fingergameButton.setBounds(75, 150, 150, 50);
+            fingergameButton.setBackground(Color.WHITE);
+            fingergameButton.setBorder(BorderFactory.createLineBorder(new Color(246, 228, 162), 2, false));
+            fingergameButton.setFocusable(false);
             p.add(fingergameButton);
 
-            checkersButton.setBounds(50, 150, 50, 50);
+            checkersButton.setBounds(75, 250, 150, 50);
+            checkersButton.setBackground(Color.WHITE);
+            checkersButton.setBorder(BorderFactory.createLineBorder(new Color(246, 228, 162), 2, false));
+            checkersButton.setFocusable(false);
             p.add(checkersButton);
         }
         
         p.revalidate();
 
-        if (h==false) {choosenGame = client.reciveMessage();
+        if (h==false) {
+            choosenGame = client.reciveMessage();
             connectToChosenGame();
         }
     }
@@ -118,21 +147,20 @@ public class App extends JFrame implements ActionListener, MouseListener{
         p.setSize(320, 350);
         p.addMouseListener(this);
         add(p);
-        p.setBackground(Color.DARK_GRAY);
+        p.setBackground(new Color(54, 38, 27));
         revalidate();
         repaint();
 
         if (host) {
-            tictactoeButton.setBounds(50, 50, 50, 50);
             p.add(tictactoeButton);
-            
-            fingergameButton.setBounds(150, 50, 50, 50);
             p.add(fingergameButton);
+            p.add(checkersButton);
         }
         
         p.revalidate();
 
-        if (host==false) {choosenGame = client.reciveMessage();
+        if (host==false) {
+            choosenGame = client.reciveMessage();
             connectToChosenGame();
         }
     }
@@ -141,7 +169,7 @@ public class App extends JFrame implements ActionListener, MouseListener{
 
         switch (choosenGame){
 
-            case "ttt": tictactoeStart(false);
+            case "ttt": tictactoeStart();
                 tttRunning = true;
                 break;
             case "fg": fingerGameStart();
@@ -155,7 +183,7 @@ public class App extends JFrame implements ActionListener, MouseListener{
 
     //=============================================================================== HANDLING TIC TAC TOE ============================================================ 
 
-    public void tictactoeStart(boolean host) throws IOException {
+    public void tictactoeStart() throws IOException {
 
         tttGame = new tictactoe(this, host);
         remove(p);
@@ -164,6 +192,7 @@ public class App extends JFrame implements ActionListener, MouseListener{
         repaint();
         revalidate();
         if (host){server.sendMessage("ttt\n");
+            System.out.println("pussy ass bitch");
             tttGame.yourTurn = true;
             tttGame.isCircle = true;
             tttGame.tttInfo.setText("it's your turn...");
@@ -172,7 +201,7 @@ public class App extends JFrame implements ActionListener, MouseListener{
 
     public void tictactoeNextTurn(String move) throws IOException{
 
-        if (host && tttGame.yourTurn) {server.sendMessage(tttGame.nextMove(move+"\n"));
+        if (host) {server.sendMessage(move+"\n");
         new java.util.Timer().schedule( 
             new java.util.TimerTask() {
                 @Override
@@ -185,7 +214,7 @@ public class App extends JFrame implements ActionListener, MouseListener{
                 }
             },  1000
         );}
-        else if (!host && tttGame.yourTurn) {client.sendMessage(tttGame.nextMove(move+"\n"));
+        else if (!host ) {client.sendMessage(move+"\n");
             new java.util.Timer().schedule( 
                 new java.util.TimerTask() {
                     @Override
@@ -203,8 +232,8 @@ public class App extends JFrame implements ActionListener, MouseListener{
 
     public void tictactoeLastTurn(String move) throws IOException {
         
-        if (host) server.sendMessage(tttGame.nextMove(move+"\n"));
-        else if (!host) client.sendMessage(tttGame.nextMove(move+"\n"));
+        if (host) server.sendMessage(move+"\n");
+        else if (!host) client.sendMessage(move+"\n");
     }
 
     //=============================================================================== HANDLING FINGER GAME ==========================================================================
@@ -274,7 +303,6 @@ public class App extends JFrame implements ActionListener, MouseListener{
         } else if (!host) {
             chGame = new checkers(false, this);
             chGame.yourTurn = false;
-            System.out.println("hi");
             chGame.handleNextMove(client.reciveMessage());
         }
         chRunning = true;
@@ -347,7 +375,7 @@ public class App extends JFrame implements ActionListener, MouseListener{
             }
         } else if (e.getSource().equals(tictactoeButton)){ //HOST CHOSE TICTACTOE
             try {
-                tictactoeStart(true);
+                tictactoeStart();
                 tttRunning = true;
             } catch (IOException e1) {
                 e1.printStackTrace();
@@ -378,21 +406,11 @@ public class App extends JFrame implements ActionListener, MouseListener{
             String ss = String.valueOf(y);
             int[] a = {x, y};
             tttGame.positionsHelper.add(a);
-            if (tttGame.checkMove(x, y) && tttGame.checkWin(tttGame.positionsHelper) && tttGame.wins==2){ //with this move im gonna win!
-                try {
-                    tictactoeLastTurn(s+":"+ss);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            } else if (tttGame.checkMove(x, y)) {
-                try {
-                    tictactoeNextTurn(s+":"+ss);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+            if (tttGame.checkMove(x, y)) {
+                tttGame.nextMove(s+":"+ss);
             }
         } else if (chRunning && chGame.yourTurn && e.getY()<=300){         
-            chGame.validateMove((double) e.getX()/checkers.blocksize, (double) e.getY()/checkers.blocksize);
+            chGame.validateMove((double) (e.getX()-4)/(checkers.blocksize), (double) (e.getY()-4)/(checkers.blocksize));
         } 
     }
 
