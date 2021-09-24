@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import javax.swing.BorderFactory;
 
 public class fingergame extends JPanel implements ActionListener{
 
@@ -42,10 +43,12 @@ public class fingergame extends JPanel implements ActionListener{
         fgInfo = new JLabel(fgInfoText, 0);
         fgInfo.setBounds(80, 135, 140, 30);
         fgWins.setBounds(100, 350, 100, 30);
-        h1.addActionListener(this);
-        h2.addActionListener(this);
-        eh1.addActionListener(this);
-        eh2.addActionListener(this);
+        for(hand h : hands){
+            h.addActionListener(this);
+            h.setBackground(Color.WHITE);
+            h.setBorder(BorderFactory.createLineBorder(new Color(54, 38, 27), 2, false));
+            h.setFocusable(false);
+        }
         h1.setEnabled(enabled);
         h2.setEnabled(enabled);
         eh1.setEnabled(false);
@@ -57,6 +60,7 @@ public class fingergame extends JPanel implements ActionListener{
         add(fgInfo);
         add(fgWins);
 
+        setBackground( new Color(246, 228, 162));
         gameroom = parent;
         repaint();
     }
@@ -229,10 +233,9 @@ public class fingergame extends JPanel implements ActionListener{
 
             if(secondClick){
                 secondClick = false;
-                eh2.setEnabled(false);
-                eh1.setEnabled(false);
-                h1.setEnabled(false);
-                h2.setEnabled(false);
+                for (hand h : hands) {
+                    h.setEnabled(false);
+                }
                 eh1.getHit(attackHand);
                 try {
                     sendGameState();
@@ -244,10 +247,9 @@ public class fingergame extends JPanel implements ActionListener{
 
             if(secondClick){
                 secondClick = false;
-                eh2.setEnabled(false);
-                eh1.setEnabled(false);
-                h1.setEnabled(false);
-                h2.setEnabled(false);
+                for (hand h : hands) {
+                    h.setEnabled(false);
+                }
                 eh2.getHit(attackHand);
                 try {
                     sendGameState();

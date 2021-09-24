@@ -1,5 +1,8 @@
 package src2.fingergame;
 
+import java.awt.Color;
+
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 
 public class hand extends JButton{
@@ -52,5 +55,16 @@ public class hand extends JButton{
         } else {
             dead = false;
         }
+    }
+
+    @Override
+    public void setEnabled(boolean b) {
+        if (!b && model.isRollover()) {
+            model.setRollover(false);
+        }
+        super.setEnabled(b);
+        model.setEnabled(b);
+        if (b) this.setBorder(BorderFactory.createLineBorder(new Color(54, 38, 27), 2, false));
+        else this.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2, false));
     }
 }
