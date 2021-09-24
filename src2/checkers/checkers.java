@@ -7,10 +7,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.awt.BasicStroke;
+import java.awt.Polygon;
 
 public class checkers extends JPanel{
     
     public static int blocksize = 37;
+    public int offset = 4;
     int h = 300;
     int w = 300; // h and w of the gameboard
     int n = 8; // number of columns and rows
@@ -32,11 +35,12 @@ public class checkers extends JPanel{
     ArrayList<stone> comboKillsBR = new ArrayList<stone>();
 
     public checkers(boolean turn, App p){
+        setLayout(null);
+        setOpaque(true);
         setSize(500,500);
         setVisible(true);
         yourTurn = turn;
         gameroom = p;
-
         resetGrid();
     }
 
@@ -82,7 +86,6 @@ public class checkers extends JPanel{
         comboDot.clear();
         moveDot.clear();
         repaint();
-
         gameState = createGameState();
         try {
             if (checkWin()) {gameroom.checkersLastTurn(gameState+"\n");}
@@ -191,7 +194,7 @@ public class checkers extends JPanel{
 
         stone ts = new stone((Math.floor(s.x/blocksize)-1)*blocksize, (Math.floor(s.y/blocksize)-1)*blocksize); //the one we eat         //tl2
         stone ss = new stone((Math.floor(s.x/blocksize)-2)*blocksize, (Math.floor(s.y/blocksize)-2)*blocksize); //where we end up after combo
-        if(!pos.contains(ts) && oppPos.contains(ts) && !pos.contains(ss) && !oppPos.contains(ss) && !exC.equals("tl")) {
+        if(!pos.contains(ts) && oppPos.contains(ts) && !pos.contains(ss) && !oppPos.contains(ss) && !exC.equals("tl") && ss.x>=0 && ss.x<=300 && ss.y<=300 && ss.y>=0) {
             if (cd.equals("tl")){
                 comboKillsTL.add(ts);
             } else if (cd.equals("tr")){
@@ -207,7 +210,7 @@ public class checkers extends JPanel{
         }
         ts = new stone((Math.floor(s.x/blocksize)+1)*blocksize, (Math.floor(s.y/blocksize)-1)*blocksize); //the one we eat               //tr2
         ss = new stone((Math.floor(s.x/blocksize)+2)*blocksize, (Math.floor(s.y/blocksize)-2)*blocksize); //where we end up after combo
-        if(!pos.contains(ts) && oppPos.contains(ts) && !pos.contains(ss) && !oppPos.contains(ss) && !exC.equals("tr")) {
+        if(!pos.contains(ts) && oppPos.contains(ts) && !pos.contains(ss) && !oppPos.contains(ss) && !exC.equals("tr") && ss.x>=0 && ss.x<=300 && ss.y<=300 && ss.y>=0) {
             if (cd.equals("tl")){
                 comboKillsTL.add(ts);
             } else if (cd.equals("tr")){
@@ -224,7 +227,7 @@ public class checkers extends JPanel{
         if (damone) {                                                                                                                    //bl2
             ts = new stone((Math.floor(s.x/blocksize)-1)*blocksize, (Math.floor(s.y/blocksize)+1)*blocksize); //the one we eat
             ss = new stone((Math.floor(s.x/blocksize)-2)*blocksize, (Math.floor(s.y/blocksize)+2)*blocksize); //where we end up after combo
-            if(!pos.contains(ts) && oppPos.contains(ts) && !pos.contains(ss) && !oppPos.contains(ss) && !exC.equals("bl")) {
+            if(!pos.contains(ts) && oppPos.contains(ts) && !pos.contains(ss) && !oppPos.contains(ss) && !exC.equals("bl") && ss.x>=0 && ss.x<=300 && ss.y<=300 && ss.y>=0) {
                 if (cd.equals("tl")){
                     comboKillsTL.add(ts);
                 } else if (cd.equals("tr")){
@@ -240,7 +243,7 @@ public class checkers extends JPanel{
             }
             ts = new stone((Math.floor(s.x/blocksize)+1)*blocksize, (Math.floor(s.y/blocksize)+1)*blocksize); //the one we eat             //br2
             ss = new stone((Math.floor(s.x/blocksize)+2)*blocksize, (Math.floor(s.y/blocksize)+2)*blocksize); //where we end up after combo
-            if(!pos.contains(ts) && oppPos.contains(ts) && !pos.contains(ss) && !oppPos.contains(ss) && !exC.equals("br")) {
+            if(!pos.contains(ts) && oppPos.contains(ts) && !pos.contains(ss) && !oppPos.contains(ss) && !exC.equals("br") && ss.x>=0 && ss.x<=300 && ss.y<=300 && ss.y>=0) {
                 if (cd.equals("tl")){
                     comboKillsTL.add(ts);
                 } else if (cd.equals("tr")){
@@ -349,6 +352,7 @@ public class checkers extends JPanel{
             }
         }
         yourTurn = true;
+        revalidate();
         repaint();
         checkWin();
     }
@@ -369,7 +373,7 @@ public class checkers extends JPanel{
                             e.printStackTrace();
                         }
                     } 
-                },  1000
+                },  3000
             );
             return true;
         }
@@ -380,7 +384,7 @@ public class checkers extends JPanel{
 
     public void resetGrid(){
 
-        for (int i=0;i<2;i++){          //8
+        for (int i=0;i<8;i++){          //8
             stone s = new stone();
             if(!(i%2==0)){
                 s.x = i*blocksize;
@@ -395,7 +399,7 @@ public class checkers extends JPanel{
             }
             pos.add(s);
         }
-        for (int i=0;i<2;i++){          //8
+        for (int i=0;i<8;i++){          //8
             stone s = new stone();
             if(i%2==0 || i==0){
                 s.x = i*blocksize;
@@ -417,43 +421,65 @@ public class checkers extends JPanel{
     public void paintComponent(Graphics g){
 
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(Color.BLACK);
 
+        g2d.setColor(new Color(246, 228, 162));
+        g2d.fillRect(0, 0, 400, 500);
+
+        g2d.setColor(new Color(54, 38, 27));
         for (int i =0; i<8; i++){
 
             if(i%2==0 || i==0) {
-                g2d.fillRect(i*blocksize, 1*blocksize, blocksize, blocksize);
-                g2d.fillRect(i*blocksize, 3*blocksize, blocksize, blocksize);
-                g2d.fillRect(i*blocksize, 5*blocksize, blocksize, blocksize);
-                g2d.fillRect(i*blocksize, 7*blocksize, blocksize, blocksize);
+                g2d.fillRect(i*blocksize+offset, 1*blocksize+offset, blocksize, blocksize);
+                g2d.fillRect(i*blocksize+offset, 3*blocksize+offset, blocksize, blocksize);
+                g2d.fillRect(i*blocksize+offset, 5*blocksize+offset, blocksize, blocksize);
+                g2d.fillRect(i*blocksize+offset, 7*blocksize+offset, blocksize, blocksize);
             } else{
-                g2d.fillRect(i*blocksize, 0*blocksize, blocksize, blocksize);
-                g2d.fillRect(i*blocksize, 2*blocksize, blocksize, blocksize);
-                g2d.fillRect(i*blocksize, 4*blocksize, blocksize, blocksize);
-                g2d.fillRect(i*blocksize, 6*blocksize, blocksize, blocksize);
+                g2d.fillRect(i*blocksize+offset, 0*blocksize+offset, blocksize, blocksize);
+                g2d.fillRect(i*blocksize+offset, 2*blocksize+offset, blocksize, blocksize);
+                g2d.fillRect(i*blocksize+offset, 4*blocksize+offset, blocksize, blocksize);
+                g2d.fillRect(i*blocksize+offset, 6*blocksize+offset, blocksize, blocksize);
             }
         }
-        for(stone s : pos){
+        g2d.setStroke(new BasicStroke(8));
+        g2d.drawLine(2, 2, 2, 302);
+        g2d.drawLine(2, 2, 302, 2);
+        g2d.drawLine(302, 2, 302, 302);
+        g2d.drawLine(2, 302, 302, 302);
+        for(stone s : pos){     
             g2d.setColor(Color.blue);
-            if (s.damone) g2d.setColor(Color.CYAN);
-            g2d.fill(s);
+            g2d.fillOval((int)s.x+offset, (int)s.y+offset, (int)s.width, (int)s.height);
+            if (s.damone){
+                g2d.setColor(Color.ORANGE); 
+                int[] xp = {(int) (12+s.x)+offset, (int) (15+s.x)+offset, (int) (18+s.x)+offset, (int) (21+s.x)+offset, (int) (24+s.x)+offset, (int) (24+s.x)+offset, (int) (12+s.x)+offset};
+                int[] yp = {(int) (12+s.y)+offset, (int) (18+s.y)+offset, (int) (12+s.y)+offset, (int) (18+s.y)+offset, (int) (12+s.y)+offset, (int) (24+s.y)+offset, (int) (24+s.y)+offset};
+                Polygon p = new Polygon(xp, yp, 7);
+                g2d.fillPolygon(p);
+            }
         }
         for(stone s : oppPos){
-            g2d.setColor(Color.red);
-            if (s.damone) g2d.setColor(Color.magenta);
-            g2d.fill(s);
+            g2d.setColor(Color.red); 
+            g2d.fillOval((int)s.x+offset, (int)s.y+offset, (int)s.width, (int)s.height);
+            if (s.damone){
+                g2d.setColor(Color.ORANGE); 
+                int[] xp = {(int) (12+s.x)+offset, (int) (15+s.x)+offset, (int) (18+s.x)+offset, (int) (21+s.x)+offset, (int) (24+s.x)+offset, (int) (24+s.x)+offset, (int) (12+s.x)+offset};
+                int[] yp = {(int) (12+s.y)+offset, (int) (18+s.y)+offset, (int) (12+s.y)+offset, (int) (18+s.y)+offset, (int) (12+s.y)+offset, (int) (24+s.y)+offset, (int) (24+s.y)+offset};
+                Polygon p = new Polygon(xp, yp, 7);
+                g2d.fillPolygon(p);
+            }
         }
         for(stone d : moveDot){
             g2d.setColor(Color.orange);
             d.x += 12;
             d.y += 12;
-            g2d.fill(d);
+            g2d.fillOval((int)d.x+offset, (int)d.y+offset, (int)d.width, (int)d.height);
+
         }
         for(stone d : comboDot){
             g2d.setColor(Color.orange);
             d.x += 12;
             d.y += 12;
-            g2d.fill(d);
+            g2d.fillOval((int)d.x+offset, (int)d.y+offset, (int)d.width, (int)d.height);
+
         }
     }
 }
