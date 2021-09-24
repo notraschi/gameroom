@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.awt.geom.*;
 import java.io.IOException;
-import java.awt.Polygon;
+
 import src2.App;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,15 +31,16 @@ public class tictactoe extends JPanel{
     ArrayList<Ellipse2D.Double> signArrayList = new ArrayList<Ellipse2D.Double>();
     ArrayList<Polygon> opponentSignArrayList = new ArrayList<Polygon>();
 
-    public JLabel tttInfo = new JLabel();
+    public JLabel tttInfo = new JLabel("",0);
     JLabel tttWins = new JLabel("0 - 0", 0);
 
     public tictactoe(App parent, boolean h){
+        setBackground(new Color(246, 228, 162));
         setBounds(50, 50, 400, 300);
         setVisible(true);
         setLayout(null);
         gameroom = parent;
-        tttInfo.setBounds(90, 310, 160, 50);
+        tttInfo.setBounds(79, 310, 150, 50);
         tttWins.setBounds(100, 350, 100, 30);
         tttInfo.setVisible(true);
         tttInfo.setAlignmentX(0.5f);
@@ -60,8 +61,8 @@ public class tictactoe extends JPanel{
         }
         opponentSignArrayList.clear();
         for (int[] i : opponetPositions){
-            int[] xs = {i[0]*blocksize, (i[0]*blocksize)+blocksize/2, (i[0]*blocksize)+blocksize, (i[0]*blocksize)+blocksize/2, (i[0]*blocksize)+blocksize, (i[0]*blocksize)+blocksize/2, i[0]*blocksize, (i[0]*blocksize)+blocksize/2};
-            int[] ys = {i[1]*blocksize, (i[1]*blocksize)+blocksize/2, i[1]*blocksize, (i[1]*blocksize)+blocksize/2, (i[1]*blocksize)+blocksize, (i[1]*blocksize)+blocksize/2, (i[1]*blocksize)+blocksize, (i[1]*blocksize)+blocksize/2};
+            int[] xs = {i[0]*blocksize+5, (i[0]*blocksize)+blocksize/2, (i[0]*blocksize)+blocksize-5, (i[0]*blocksize)+blocksize/2, (i[0]*blocksize)+blocksize-5, (i[0]*blocksize)+blocksize/2, i[0]*blocksize+5, (i[0]*blocksize)+blocksize/2};
+            int[] ys = {i[1]*blocksize+5, (i[1]*blocksize)+blocksize/2, i[1]*blocksize+5, (i[1]*blocksize)+blocksize/2, (i[1]*blocksize)+blocksize-5, (i[1]*blocksize)+blocksize/2, (i[1]*blocksize)+blocksize-5, (i[1]*blocksize)+blocksize/2};
             Polygon sign = new Polygon(xs, ys, 8);
             opponentSignArrayList.add(sign);
         }
@@ -82,9 +83,28 @@ public class tictactoe extends JPanel{
             tttInfo.setText("WON"); 
             wins++;
             tttWins.setText(String.valueOf(wins)+" - "+String.valueOf(losses));
-            checkReturnToLobby();
+            if (wins > 2 || losses >2) {
+                try {
+                    gameroom.tictactoeLastTurn(move);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                checkReturnToLobby();
+            } else {
+                try {
+                    gameroom.tictactoeNextTurn(move);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
             yourTurn = false;
             restart(false);
+        } else {
+            try {
+                gameroom.tictactoeNextTurn(move);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         if(moveNumber > 8) restart(false);
         return move;
@@ -111,10 +131,8 @@ public class tictactoe extends JPanel{
             tttWins.setText(String.valueOf(wins)+" - "+String.valueOf(losses));
             checkReturnToLobby();
             yourTurn = false;
-            if (wins!=1 || losses!=1) restart(true);
-            else restart(false);
-        }
-        paintGrid();
+            restart(true);
+        }else paintGrid();
         if(moveNumber > 8) restart(true);
     }
 
@@ -153,7 +171,7 @@ public class tictactoe extends JPanel{
     private void checkReturnToLobby(){
 
         tictactoe game = this;
-        if (wins == 3 || losses == 3){
+        if (wins > 2 || losses >2){
             new java.util.Timer().schedule( 
             new java.util.TimerTask() {
                 @Override
@@ -207,7 +225,7 @@ public class tictactoe extends JPanel{
         Graphics2D g2d = (Graphics2D) g;
 
         g2d.setStroke(new BasicStroke(3));
-        g2d.setColor(Color.BLACK);
+        g2d.setColor(new Color(54, 38, 27));
         for (int i =1; i<3; i++){
 
             g2d.drawLine(0, i *blocksize, 300, i*blocksize);
@@ -216,7 +234,7 @@ public class tictactoe extends JPanel{
 
         g2d.setColor(Color.BLUE);
         for (Ellipse2D.Double ed : signArrayList){
-            g2d.draw(ed);
+            g2d.drawOval((int)ed.x+5, (int)ed.y+5, (int)ed.width-10,(int) ed.height-10);
         }
         g2d.setColor(Color.RED);
         for (Polygon ed : opponentSignArrayList){
