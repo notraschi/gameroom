@@ -6,11 +6,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
-import src2.checkers.checkers;
-import src2.fingergame.fingergame;
-import src2.tictactoe.*;
-
 import java.awt.Color;
 import java.awt.event.*;
 import java.io.IOException;
@@ -20,13 +15,13 @@ public class App extends JFrame implements ActionListener, MouseListener{       
     JPanel p = new JPanel();
     JButton cliButton = new JButton("JOIN");
     JButton srvButton = new JButton("HOST");
-    JTextField cipField = new JTextField(" ip here"); //"192.168.8.130"
-    JTextField cportField = new JTextField(" port here"); // "6969"
-    JTextField sportField = new JTextField(" port here"); // "6969"
+    JTextField cipField = new JTextField("192.168.8.130"); //"192.168.8.130"  " ip here"
+    JTextField cportField = new JTextField("6969"); // "6969"    " port here"
+    JTextField sportField = new JTextField("6969"); // "6969"    " port here"
     JButton tictactoeButton = new JButton("TRIS");
     JButton fingergameButton = new JButton("FINGER GAME");
     JButton checkersButton = new JButton("CHECKERS");
-    JLabel VERSION = new JLabel("gameroom v0.2 - 09/21");
+    JLabel VERSION = new JLabel("gameroom v1.0 - 09/21"); //fixed bug in checkers
 
     JPanel test = new JPanel();
 
@@ -91,7 +86,6 @@ public class App extends JFrame implements ActionListener, MouseListener{       
         for (JButton i : UIButtons){
             i.setBackground(Color.WHITE);
             i.setBorder(BorderFactory.createLineBorder(new Color(54, 38, 27), 2, false));
-            i.setFocusable(false);
         }
     }
 
