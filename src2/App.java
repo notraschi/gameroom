@@ -9,6 +9,7 @@ import javax.swing.JTextField;
 import java.awt.Color;
 import java.awt.event.*;
 import java.io.IOException;
+import java.awt.Toolkit;
 
 public class App extends JFrame implements ActionListener, MouseListener{       // new Color(246, 228, 162) [BG]    // new Color(54, 38, 27) [CONTRAST]
 
@@ -21,7 +22,7 @@ public class App extends JFrame implements ActionListener, MouseListener{       
     JButton tictactoeButton = new JButton("TRIS");
     JButton fingergameButton = new JButton("FINGER GAME");
     JButton checkersButton = new JButton("CHECKERS");
-    JLabel VERSION = new JLabel("gameroom v1.0 - 09/21"); //fixed bug in checkers
+    JLabel VERSION = new JLabel("gameroom v1.1 - 09/21"); //fixed bug in checkers
 
     JPanel test = new JPanel();
 
@@ -49,6 +50,8 @@ public class App extends JFrame implements ActionListener, MouseListener{       
     App(){
 
         VERSION.setBounds(03,390,200, 25);
+        setTitle("Gameroom");
+        setIconImage(Toolkit.getDefaultToolkit().getImage("D:\\Documents\\CODE\\JAVA\\gameroom\\lib\\icon.png"));
         p.setBackground(new Color(246, 228, 162));
         p.add(VERSION);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
